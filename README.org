@@ -9,11 +9,11 @@ use i64 as a board representation, since boards are associatives (this idea/info
 
 the i64 or int64_t on C, are a great way to have a board representation, because is a conveninent number, that can been expoerted/dumped and used on another language without so much conversion
 
-the calculations show that it can perform a 12 roads board of Soroban (64 / 5 ~ 12) with can proficiently handle a 1 trilion value board support on the 1.8E19 combinations of the i64 (2^64), with this, a association of boards can been perform
+the calculations show that it can perform a 12 rods board of Soroban (64 / 5 ~ 12) with can proficiently handle a 1 trilion value board support on the 1.8E19 combinations of the i64 (2^64), with this, a association of boards can been perform
 
 the main idea is that the board is on a configuration on with the numbers are on a sequence on the binary representation of the number, using each bit to represent a uppper bead (with can bee associated on the lower beads to bee positive upper beads too (or down beads on the 5 bead value on the top of the soroban)).
 
-bellow a board representation illustration (with the 12 roads)
+bellow a board representation illustration (with the 12 rods)
 
 #+begin_src text
 -----------------------------------------------
@@ -46,7 +46,7 @@ bellow the 64 bits of a i64
 [ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]
 #+end_src
 
-on with we take 5 bits each to represent a road ( with have 5 beads total )
+on with we take 5 bits each to represent a rod ( with have 5 beads total )
 
 #+begin_src lua
 [ 0 0 0 0 0 0 0 0 0 0 0 0   --- top 1, value 5 beads on
@@ -59,13 +59,13 @@ on with we take 5 bits each to represent a road ( with have 5 beads total )
 
 (DISCLAIMER .: been ware that this struct probably will not reflect the actual slicing of 5 bits at time of the actual i64)
 
-there is 12 roads on with the top and botton, if one road is active on a bit, of one colum, they will active value of the road of this road, this is exception of the road of the top, with active, value +5 on the road on question.
+there is 12 rods on with the top and botton, if one rod is active on a bit, of one colum, they will active value of the rod of this rod, this is exception of the rod of the top, with active, value +5 on the rod on question.
 
-with this approuch, xor | bitwish operations will been more performantic and more eficient for more disclosure and even multiplications for zeration of ceart parts of the board. of instance, enable 4 on botton will make any road on the botton, to been zero. for instance, we can create with bitwish operations MACRO numbers to represent board default states, and check for places where there is values, more eficiently as well as setting new state of the board more rapidly
+with this approuch, xor | bitwish operations will been more performantic and more eficient for more disclosure and even multiplications for zeration of ceart parts of the board. of instance, enable 4 on botton will make any rod on the botton, to been zero. for instance, we can create with bitwish operations MACRO numbers to represent board default states, and check for places where there is values, more eficiently as well as setting new state of the board more rapidly
 
 *** Simulator / Interpreter
 
-The board will use a little instruction/Enum/Union interpreter (we know that they may have a name of emulator, but since we do not bother do emulate the world phisics we call it's simulation, even they behave like a limited emulator.. we preferer this word as well) on with they are a array of tuple of road number* and instruction on with
+The board will use a little instruction/Enum/Union interpreter (we know that they may have a name of emulator, but since we do not bother do emulate the world phisics we call it's simulation, even they behave like a limited emulator.. we preferer this word as well) on with they are a array of tuple of rod number* and instruction on with
 
 bellown a pseudo-code / haskell-like
 
@@ -82,13 +82,13 @@ The Instructions and ADT
 #+begin_src odin
 
 MAX_NUMBER_OF_BOARDS :: 64
-MAX_ROAD_PER_SOROBAN_BOARD :: 12
+MAX_ROD_PER_SOROBAN_BOARD :: 12
 MAX_SOROBAN_INSTRUCTIONS_PER_BOARD :: 8192 // 2^13
 MAX_SOROBAN_OPERATIONS_PER_BOARD :: 64
 
 Soroban_Board :: struct {
 	board : i64,
-	idx_current_road : i8,
+	idx_current_rod : i8,
 	scale_board : i8 = 1, // value to consider for scaling state eval
 	current_state_board_eval : i32,
 	current_instruction : Soroban_Instructions,
@@ -104,7 +104,7 @@ Infini_Soroban :: struct {
 	[dynamic]Soroban_Board, // TODO: change to Queue
 	total_state_of_boards : i64,
 	idx_current_board : i64,
-	idx_globa_current_road : i64, // deprecated?
+	idx_globa_current_rod : i64, // deprecated?
 	number_of_boards : i64,
 	operations : Soroban_Operation_Instructions,
 	operands : Soroban_Operands,
@@ -114,7 +114,7 @@ Soroban_Operation_Instructions :: struct {
 	current_idx_opins : i64,
 	remain_value : i64,
 	instructions : [MAX_MAX_SOROBAN_INSTRUCTIONS_PER_BOARD]Soroban_Instructions,
-	roads_idx : [MAX_SOROBAN_INSTRUCTIONS_PER_BOARD]i64,
+	rods_idx : [MAX_SOROBAN_INSTRUCTIONS_PER_BOARD]i64,
 }
 
 Soroban_Instructions :: union {
@@ -131,7 +131,7 @@ Soroban_Instructions :: union {
 	INS_SB_SUB_4,
 	INS_SB_SUB_5,
 
-	INS_SB_CLEAR_ROAD,
+	INS_SB_CLEAR_ROD,
 
 	INS_SB_NOP,
 
@@ -167,8 +167,8 @@ INS_SB_SUB_4 :: struct {
 INS_SB_SUB_5 :: struct {
 	MACRO_NUMBER_INS_SB_SUB_5 : i64,
 }
-INS_SB_CLEAR_ROAD :: struct {
-	MACRO_NUMBER_INS_SB_CLEAR_ROAD : i64,
+INS_SB_CLEAR_ROD :: struct {
+	MACRO_NUMBER_INS_SB_CLEAR_ROD : i64,
 }
 
 
@@ -176,7 +176,7 @@ INS_SB_CLEAR_ROAD :: struct {
 
 DISCLAIMER .: pay attention that this code can been out of date with the actual code on the source, also, that this is not intent to been working code, but a touth exercise on who to model the Data Structure to represent the code. and this example code, need to been fuder analise for better design also, operations and instructions (bytecode asm) needs to been distinct on the actual code and simulation part.
 
-for compreension, operations as multiplication and division do not exist as well as complementary numbers, because, this is all abstractions on the fundamental structure of adition and subtractions of arbitrary roads possitions, even the idea of roads for temporary state are also a completly abstration as show on [[https://www.cambridge.org/core/journals/canadian-mathematical-bulletin/article/how-to-program-an-infinite-abacus/A6EB7DD8D57056044CCB128923764BEB][how to program a infinity abacus]], so yeah... thats the 'implementation', else where, we use the resulting simulation of the architecture to do checks with the operational system operators, on the UI, if is correct the result of the simulation and state of the board..
+for compreension, operations as multiplication and division do not exist as well as complementary numbers, because, this is all abstractions on the fundamental structure of adition and subtractions of arbitrary rods possitions, even the idea of rods for temporary state are also a completly abstration as show on [[https://www.cambridge.org/core/journals/canadian-mathematical-bulletin/article/how-to-program-an-infinite-abacus/A6EB7DD8D57056044CCB128923764BEB][how to program a infinity abacus]], so yeah... thats the 'implementation', else where, we use the resulting simulation of the architecture to do checks with the operational system operators, on the UI, if is correct the result of the simulation and state of the board..
 
 
 ** TODO
