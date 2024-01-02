@@ -1,0 +1,99 @@
+
+* Soroban
+
+try to implement a infinity Soroban Board and simulator / Assistent
+
+** Idea
+
+use i64 as a board representation, since boards are associatives (this idea/information has not come to my mind before, this is way the main idea take so long) and values can been easily multiply by the new number/scale of necessary boards add, thereis a ways and sheap way of implement this with dynamic arrays using Odin buildin dynamic array and the i64
+
+the i64 or int64_t on C, are a great way to have a board representation, because is a conveninent number, that can been expoerted/dumped and used on another language without so much conversion
+
+the calculations show that it can perform a 12 roads board of Soroban with can proficiently handle a 1 trilion digit board support on the 1.8E19 combinations of the i64 (2^64), with this, a association of boards can been perform
+
+the main idea is that the board is on a configuration on with the numbers are on a sequence on the binary representation of the number, using each bit to represent a uppper bead (with can bee associated on the lower beads to bee positive upper beads too (or down beads on the 5 bead value on the top of the soroban)).
+
+bellow a board representation illustration (with the 12 roads)
+
+#+begin_src text
+-----------------------------------------------
+<|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|>
+ |   |   |   |   |   |   |   |   |   |   |   |
+-----------------------------------------------
+ |   |   |   |   |   |   |   |   |   |   |   |
+<|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|>
+<|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|>
+<|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|>
+<|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|> <|>
+-----------------------------------------------
+#+end_src
+
+for this board, we only need to represent the beads, if they are upper or down, and with this configurations, using a assuptions of a array of bits / booleans
+
+#+begin_src lua
+[ 0  0  0  0  0  0  0  0  0  0  0  0 ]
+[ 0  0  0  0  0  0  0  0  0  0  0  0 ]
+[ 0  0  0  0  0  0  0  0  0  0  0  0 ]
+[ 0  0  0  0  0  0  0  0  0  0  0  0 ]
+[ 0  0  0  0  0  0  0  0  0  0  0  0 ]
+#+end_src
+
+with this binary representation, we can serialize this on a binary number, on the 64 bits of a i64
+
+bellow the 64 bits of a i64
+
+#+begin_src lua
+[ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+#+end_src
+
+on with we take 5 bits each to represent a road ( with have 5 beads total )
+
+#+begin_src lua
+[ 0 0 0 0 0 0 0 0 0 0 0 0   --- top 1, value 5 beads on
+  0 0 0 0 0 0 0 0 0 0 0 0   --- bead value 1
+  0 0 0 0 0 0 0 0 0 0 0 0   --- bead value 2
+  0 0 0 0 0 0 0 0 0 0 0 0   --- bead value 3
+  0 0 0 0 0 0 0 0 0 0 0 0   --- bead value 4
+  | 0 0 0 ] --- three last bits that can bee used of represent boards states, if necessary
+#+end_src
+
+there is 12 roads on with the top and botton, if one road is active on a bit, of one colum, they will active value of the road of this road, this is exception of the road of the top, with active, value +5 on the road on question.
+
+with this approuch, xor | bitwish operations will been more performantic and more eficient for more disclosure and even multiplications for zeration of ceart parts of the board. of instance, enable 4 on botton will make any road on the botton, to been zero. for instance, we can create with bitwish operations MACRO numbers to represent board default states, and check for places where there is values, more eficiently as well as setting new state of the board more rapidly
+
+The board will use a little instruction/Enum interpreter on with they are a array of tuple of road number* and instruction on with
+
+#+begin_src odin
+dynamic [(possition : i64, asm_ins : Soroban_Instruction )]
+#+end_src
+
+perform operation on the abacus for doing the calculations and work as a interface for the infinity* soroban simulation .
+
+** TODO
+
+now we need to implement a framework/library to deal with this idea of board configuration and exceptions*, including f*cking NaN of the [[https://en.wikipedia.org/wiki/IEEE_754][IEEE_754]]
+
+with this memory leout, we can deal easily with infinity* soroban boards, with pretty much no cost at all on memory... (hopefully)
+
+** research
+
+there is also a possible and easy to use conversion using Gray Code for dealing with the amount of bitwish operations, but we can work arround that using matrix* bitwish operations directly on the i64.
+
+** demos
+
+
+
+** motivation
+
+try to implement a infinity Soroban Board. ( also a assistend for self learn and testing with statistics and measurements )
+
+the magic of the abacus make me think if there is any way to perform more eficient operation on the board (and test,mesure this), and always think on how this can been perform (on a Rubik's Cube twoo)
+
+the ultimante goal of this project is perform a generic algoritm with markov chains to generate random moviments on with they are selected on a Monte Carlo Simulation, to perform operations that are closer to the actual or even correct response ( and isolete then with statistics, exporting data for fother examination ) for operations with the determined number and operation on the soroban.
+
+the main idead is also, to perform a nealy infinity Soroban on with they can perform infinity* calculations, as simulations .
+
+
+* version of [[https://github.com/odin-lang/odin][Odin]]
+
+dev-2023-11:ef5eb4b6
