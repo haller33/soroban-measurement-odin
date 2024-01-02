@@ -82,13 +82,13 @@ The Instructions and ADT
 
 #+begin_src odin
 
-import qu "core:container/queue"
 
 MAX_NUMBER_OF_BOARDS :: 64
 MAX_ROD_PER_SOROBAN_BOARD :: 12
-MAX_SOROBAN_INSTRUCTIONS_PER_BOARD :: 8192 // 2^13
+MAX_SOROBAN_INSTRUCTIONS :: 8192 // 2^13
 MAX_SOROBAN_OPERATIONS_PER_BOARD :: 64
 MAX_SOROBAN_OPERANDS :: 65536              // 2^16
+
 
 Soroban_Board :: struct {
 	board : i64,
@@ -113,8 +113,8 @@ Infini_Soroban :: struct {
 Soroban_Operation_Instructions :: struct {
 	current_idx_opins : i64,
 	remain_value : i64,
-	instructions : [MAX_MAX_SOROBAN_INSTRUCTIONS_PER_BOARD]Soroban_Instructions,
-	rods_idx : [MAX_SOROBAN_INSTRUCTIONS_PER_BOARD]i64,
+	instructions : [MAX_SOROBAN_INSTRUCTIONS]Soroban_Instructions,
+	rods_idx : [MAX_SOROBAN_INSTRUCTIONS]i64,
 }
 
 Soroban_Instructions :: union {
