@@ -61,13 +61,150 @@ there is 12 roads on with the top and botton, if one road is active on a bit, of
 
 with this approuch, xor | bitwish operations will been more performantic and more eficient for more disclosure and even multiplications for zeration of ceart parts of the board. of instance, enable 4 on botton will make any road on the botton, to been zero. for instance, we can create with bitwish operations MACRO numbers to represent board default states, and check for places where there is values, more eficiently as well as setting new state of the board more rapidly
 
+*** Simulator / Interpreter
+
 The board will use a little instruction/Enum interpreter on with they are a array of tuple of road number* and instruction on with
+
+bellown a pseudo-code / haskell-like
 
 #+begin_src odin
 dynamic [(possition : i64, asm_ins : Soroban_Instruction )]
 #+end_src
 
 perform operation on the abacus for doing the calculations and work as a interface for the infinity* soroban simulation .
+
+the simulation, will receive a board ( a actualy number of i64 type ) that then, will perform operation acordly with MACRO numbers and the instructions, the idea is that can been performatic and easy to check.
+
+The Instructions and ADT
+
+#+begin_src odin
+
+MAX_ROAD_PER_SOROBAN_BOARD :: 12
+MAX_SOROBAN_INSTRUCTIONS_PER_BOARD :: 8192 // 2^13
+MAX_SOROBAN_OPERATIONS_PER_BOARD :: 64
+
+SB_Addition :: struct {
+	first_value : i64,
+	second_value : i64,
+	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
+}
+SB_Multiplication :: struct {
+	first_value : i64,
+	second_value : i64,
+	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
+}
+SB_Subtration :: struct {
+	first_value : i64,
+	second_value : i64,
+	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
+}
+SB_Division :: struct {
+	first_value : i64,
+	second_value : i64,
+	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
+}
+SB_Square_Root :: struct {
+	first_value : i64,
+	second_value : i64,
+	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
+}
+SB_Cubic_Square :: struct {
+	first_value : i64,
+	second_value : i64,
+	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
+}
+
+Operation_Soroban_Type :: enum {
+	SB_Addition,
+	SB_Multiplication,
+	SB_Subtration,
+	SB_Division,
+	SB_Square_Root,
+	SB_Cubic_Square,
+};
+
+Soroban_Board :: struct {
+	board : i64,
+	current_state_board_eval : i64,
+	current_instruction : Soroban_Instructions,
+	MAX_ROADS : i64 = MAX_ROAD_PER_SOROBAN_BOARD,
+	scale_board : i64 = 1, // value to consider for scaling state eval
+	idx_road : i64,
+	idx_board : i64,
+};
+
+Soroban_Operations :: struct {
+	current_instruction_idx : i64,
+	index_operation : i64,
+	index_number_operated_for : i64,
+	Operations : [MAX_SOROBAN_OPERATIONS_PER_BOARD]Operation_Soroban_Type,
+	Numbers_in_operation_by_operations : [MAX_SOROBAN_OPERATIONS_PER_BOARD]f64,
+}
+
+Infini_Soroban :: struct {
+	[dynamic]Soroban_Board,
+	total_state_of_boards : i64,
+	idx_current_board : i64,
+	idx_globa_current_road : i64,
+	number_of_boards : i64,
+	MAX_BOARDS : i64,
+	operations : Soroban_Operations,
+}
+
+Soroban_Instructions :: enum {
+INS_SB_ADD_1,
+INS_SB_ADD_2,
+INS_SB_ADD_3,
+INS_SB_ADD_4,
+INS_SB_ADD_5,
+INS_SB_SUB_1,
+INS_SB_SUB_2,
+INS_SB_SUB_3,
+INS_SB_SUB_4,
+INS_SB_SUB_5,
+
+// this instructions do not make sense on the board, since they are instructions that take place on the board abstract idea.
+// INS_SB_COMPL_5,
+// INS_SB_COMPL_10,
+// INS_SB_RELATIVE_ADD,
+// INS_SB_RELATIVE_SUB,
+
+};
+
+INS_SB_ADD_1 :: struct {
+	MACRO_NUMBER_INS_SB_ADD_1 : i64,
+}
+INS_SB_ADD_2 :: struct {
+	MACRO_NUMBER_INS_SB_ADD_2 : i64,
+}
+INS_SB_ADD_3 :: struct {
+	MACRO_NUMBER_INS_SB_ADD_3 : i64,
+}
+INS_SB_ADD_4 :: struct {
+	MACRO_NUMBER_INS_SB_ADD_4 : i64,
+}
+INS_SB_ADD_5 :: struct {
+	MACRO_NUMBER_INS_SB_ADD_5 : i64,
+}
+INS_SB_SUB_1 :: struct {
+	MACRO_NUMBER_INS_SB_SUB_1 : i64,
+}
+INS_SB_SUB_2 :: struct {
+	MACRO_NUMBER_INS_SB_SUB_2 : i64,
+}
+INS_SB_SUB_3 :: struct {
+	MACRO_NUMBER_INS_SB_SUB_3 : i64,
+}
+INS_SB_SUB_4 :: struct {
+	MACRO_NUMBER_INS_SB_SUB_4 : i64,
+}
+INS_SB_SUB_5 :: struct {
+	MACRO_NUMBER_INS_SB_SUB_5 : i64,
+}
+
+#+end_src
+
+DISCLAIMER .: pay attention that this code can been out of date with the actual code on the source, also, that this is not intent to been working code, but a touth exercise on who to model the Data Structure to represent the code. and this example code, need to been fuder analise for better design also, operations and instructions (bytecode asm) needs to been distinct on the actual code and simulation part.
 
 ** TODO
 
