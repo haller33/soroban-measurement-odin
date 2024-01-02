@@ -5,7 +5,7 @@ try to implement a infinity Soroban Board and simulator / Assistent
 
 ** Idea
 
-use i64 as a board representation, since boards are associatives (this idea/information has not come to my mind before, this is way the main idea take so long) and values can been easily multiply by the new number/scale of necessary boards add, thereis a ways and sheap way of implement this with dynamic arrays/queues (preferable queues because infinity small numbers representation) using Odin buildin dynamic array and the i64
+use i64 as a board representation, since boards are associatives (this idea/information has not come to my mind before, this is way the main idea take so long) and values can been easily multiply by the new number/scale of necessary boards add, thereis a ways and sheap way of implement this with dynamic arrays/queues (preferable queues because infinity small numbers representation) using Odin buildin dynamic/queue and the i64
 
 the i64 or int64_t on C, are a great way to have a board representation, because is a conveninent number, that can been expoerted/dumped and used on another language without so much conversion
 
@@ -61,7 +61,7 @@ on with we take 5 bits each to represent a rod ( with have 5 beads total )
 
 there is 12 rods on with the top and botton, if one rod is active on a bit, of one colum, they will active value of the rod of this rod, this is exception of the rod of the top, with active, value +5 on the rod on question.
 
-with this approuch, xor | bitwish operations will been more performantic and more eficient for more disclosure and even multiplications for zeration of ceart parts of the board. of instance, enable 4 on botton will make any rod on the botton, to been zero. for instance, we can create with bitwish operations MACRO numbers to represent board default states, and check for places where there is values, more eficiently as well as setting new state of the board more rapidly
+with this approuch, xor | bitwish operations will been more performantic and more eficient for more disclosure and even multiplications for zeration of ceart parts of the board. of instance, enable 4 on botton will make any rod on the botton, to been zero. for instance, we can create with bitwish operations MACRO/Magic numbers to represent board default states, and check for places where there is values, more eficiently as well as setting new state of the board more rapidly/eficiently
 
 *** Simulator / Interpreter
 
@@ -70,7 +70,8 @@ The board will use a little instruction/Enum/Union interpreter (we know that the
 bellown a pseudo-code / haskell-like
 
 #+begin_src odin
-dynamic [(possition : i64, asm_ins : Soroban_Instruction )]
+import qu "core:container/queue"
+qu.Queue (possition : i64, asm_ins : Soroban_Instruction )
 #+end_src
 
 perform operation on the abacus for doing the calculations and work as a interface for the infinity* soroban simulation .
@@ -81,6 +82,8 @@ The Instructions and ADT
 
 #+begin_src odin
 
+import qu "core:container/queue"
+
 MAX_NUMBER_OF_BOARDS :: 64
 MAX_ROD_PER_SOROBAN_BOARD :: 12
 MAX_SOROBAN_INSTRUCTIONS_PER_BOARD :: 8192 // 2^13
@@ -89,8 +92,8 @@ MAX_SOROBAN_OPERATIONS_PER_BOARD :: 64
 Soroban_Board :: struct {
 	board : i64,
 	idx_current_rod : i8,
-	scale_board : i8 = 1, // value to consider for scaling state eval
-	current_state_board_eval : i32,
+	scale_board : i64, // value to consider for scaling state eval
+	current_state_board_eval : i32, // the board can only represent 1 trilion value
 	current_instruction : Soroban_Instructions,
 	idx_board : i64,
 };
@@ -105,7 +108,6 @@ Infini_Soroban :: struct {
 	total_state_of_boards : i64,
 	idx_current_board : i64,
 	idx_globa_current_rod : i64, // deprecated?
-	number_of_boards : i64,
 	operations : Soroban_Operation_Instructions,
 	operands : Soroban_Operands,
 }
@@ -119,56 +121,59 @@ Soroban_Operation_Instructions :: struct {
 
 Soroban_Instructions :: union {
 
-	INS_SB_ADD_1,
-	INS_SB_ADD_2,
-	INS_SB_ADD_3,
-	INS_SB_ADD_4,
-	INS_SB_ADD_5,
+	INS_SB_ON_GO_DAMA_5,
+	INS_SB_ON_ICHI_DAMA_1,
+	INS_SB_ON_ICHI_DAMA_2,
+	INS_SB_ON_ICHI_DAMA_3,
+	INS_SB_ON_ICHI_DAMA_4,
 
-	INS_SB_SUB_1,
-	INS_SB_SUB_2,
-	INS_SB_SUB_3,
-	INS_SB_SUB_4,
-	INS_SB_SUB_5,
+	INS_SB_ZERO_GO_DAMA_5,
+	INS_SB_ZERO_ICHI_DAMA_1,
+	INS_SB_ZERO_ICHI_DAMA_2,
+	INS_SB_ZERO_ICHI_DAMA_3,
+	INS_SB_ZERO_ICHI_DAMA_4,
 
 	INS_SB_CLEAR_ROD,
 
 	INS_SB_NOP,
-
 };
 
-INS_SB_ADD_1 :: struct {
-	MACRO_NUMBER_INS_SB_ADD_1 : i64,
+
+INS_SB_ON_GO_DAMA_5 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ON_GO_DAMA_5 : i64,
 }
-INS_SB_ADD_2 :: struct {
-	MACRO_NUMBER_INS_SB_ADD_2 : i64,
+INS_SB_ON_ICHI_DAMA_1 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ON_ICHI_DAMA_1 : i64,
 }
-INS_SB_ADD_3 :: struct {
-	MACRO_NUMBER_INS_SB_ADD_3 : i64,
+INS_SB_ON_ICHI_DAMA_2 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ON_ICHI_DAMA_2 : i64,
 }
-INS_SB_ADD_4 :: struct {
-	MACRO_NUMBER_INS_SB_ADD_4 : i64,
+INS_SB_ON_ICHI_DAMA_3 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ON_ICHI_DAMA_3 : i64,
 }
-INS_SB_ADD_5 :: struct {
-	MACRO_NUMBER_INS_SB_ADD_5 : i64,
+INS_SB_ON_ICHI_DAMA_4 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ON_ICHI_DAMA_4 : i64,
 }
-INS_SB_SUB_1 :: struct {
-	MACRO_NUMBER_INS_SB_SUB_1 : i64,
+INS_SB_ZERO_GO_DAMA_5 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ZERO_GO_DAMA_5 : i64,
 }
-INS_SB_SUB_2 :: struct {
-	MACRO_NUMBER_INS_SB_SUB_2 : i64,
+INS_SB_ZERO_ICHI_DAMA_1 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ZERO_ICHI_DAMA_1 : i64,
 }
-INS_SB_SUB_3 :: struct {
-	MACRO_NUMBER_INS_SB_SUB_3 : i64,
+INS_SB_ZERO_ICHI_DAMA_2 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ZERO_ICHI_DAMA_2 : i64,
 }
-INS_SB_SUB_4 :: struct {
-	MACRO_NUMBER_INS_SB_SUB_4 : i64,
+INS_SB_ZERO_ICHI_DAMA_3 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ZERO_ICHI_DAMA_3 : i64,
 }
-INS_SB_SUB_5 :: struct {
-	MACRO_NUMBER_INS_SB_SUB_5 : i64,
+INS_SB_ZERO_ICHI_DAMA_4 :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_ZERO_ICHI_DAMA_4 : i64,
 }
 INS_SB_CLEAR_ROD :: struct {
-	MACRO_NUMBER_INS_SB_CLEAR_ROD : i64,
+	MACRO_MAGIC_NUMBER_INS_SB_CLEAR_ROD : i64,
+}
+INS_SB_NOP :: struct {
+	MACRO_MAGIC_NUMBER_INS_SB_NOP : i64,
 }
 
 
@@ -178,6 +183,7 @@ DISCLAIMER .: pay attention that this code can been out of date with the actual 
 
 for compreension, operations as multiplication and division do not exist as well as complementary numbers, because, this is all abstractions on the fundamental structure of adition and subtractions of arbitrary rods possitions, even the idea of rods for temporary state are also a completly abstration as show on [[https://www.cambridge.org/core/journals/canadian-mathematical-bulletin/article/how-to-program-an-infinite-abacus/A6EB7DD8D57056044CCB128923764BEB][how to program a infinity abacus]], so yeah... thats the 'implementation', else where, we use the resulting simulation of the architecture to do checks with the operational system operators, on the UI, if is correct the result of the simulation and state of the board..
 
+this instructions needs to get aways of the underline idea of sum of values, since they are not a actually adition, but a actual activation of beads as bits on a matrix*, so the best underline interpretation to figure out is on and zero bit set, because is a active seting of bits. (again go to research to see if Gray Code will better for this effort...)
 
 ** TODO
 
@@ -203,6 +209,12 @@ the ultimante goal of this project is perform a generic algoritm with markov cha
 
 the main idead is also, to perform a nealy infinity Soroban on with they can perform infinity* calculations, as simulations .
 
+*** old naming
+the old project idea name has been
+
+- a Soroban Mesurement System on Odin and using Raylib
+
+the new intent is been a simulation of a infinity soroban and assistant for test using raylib and odin
 
 * version of [[https://github.com/odin-lang/odin][Odin]]
 
