@@ -65,7 +65,7 @@ with this approuch, xor | bitwish operations will been more performantic and mor
 
 *** Simulator / Interpreter
 
-The board will use a little instruction/Enum interpreter on with they are a array of tuple of road number* and instruction on with
+The board will use a little instruction/Enum/Union interpreter (we know that they may have a name of emulator, but since we do not bother do emulate the world phisics we call it's simulation, even they behave like a limited emulator.. we preferer this word as well) on with they are a array of tuple of road number* and instruction on with
 
 bellown a pseudo-code / haskell-like
 
@@ -86,90 +86,54 @@ MAX_ROAD_PER_SOROBAN_BOARD :: 12
 MAX_SOROBAN_INSTRUCTIONS_PER_BOARD :: 8192 // 2^13
 MAX_SOROBAN_OPERATIONS_PER_BOARD :: 64
 
-SB_Addition :: struct {
-	first_value : i64,
-	second_value : i64,
-	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
-}
-SB_Multiplication :: struct {
-	first_value : i64,
-	second_value : i64,
-	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
-}
-SB_Subtration :: struct {
-	first_value : i64,
-	second_value : i64,
-	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
-}
-SB_Division :: struct {
-	first_value : i64,
-	second_value : i64,
-	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
-}
-SB_Square_Root :: struct {
-	first_value : i64,
-	second_value : i64,
-	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
-}
-SB_Cubic_Square :: struct {
-	first_value : i64,
-	second_value : i64,
-	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
-}
-
-Operation_Soroban_Type :: union {
-	SB_Addition,
-	SB_Multiplication,
-	SB_Subtration,
-	SB_Division,
-	SB_Square_Root,
-	SB_Cubic_Square,
-};
-
 Soroban_Board :: struct {
 	board : i64,
 	idx_current_road : i8,
-	MAX_ROADS : i8 = MAX_ROAD_PER_SOROBAN_BOARD,
-	scale_board : i16 = 1, // value to consider for scaling state eval
+	scale_board : i8 = 1, // value to consider for scaling state eval
 	current_state_board_eval : i32,
 	current_instruction : Soroban_Instructions,
 	idx_board : i64,
 };
 
-Soroban_Operations :: struct {
-	current_instruction_idx : i64,
-	index_operation : i64,
-	index_number_operated_for : i64,
-	Operations : [MAX_SOROBAN_OPERATIONS_PER_BOARD]Operation_Soroban_Type,
-	Numbers_in_operation_by_operations : [MAX_SOROBAN_OPERATIONS_PER_BOARD]f64,
+Soroban_Operands :: struct {
+	current_operand_idx : i64,
+	operand_numbers : [MAX_SOROBAN_OPERATIONS_PER_BOARD]i64,
 }
 
 Infini_Soroban :: struct {
-	[dynamic]Soroban_Board,
+	[dynamic]Soroban_Board, // TODO: change to Queue
 	total_state_of_boards : i64,
 	idx_current_board : i64,
-	idx_globa_current_road : i64,
+	idx_globa_current_road : i64, // deprecated?
 	number_of_boards : i64,
-	MAX_BOARDS : i64 = MAX_NUMBER_OF_BOARDS,
-	operations : Soroban_Operations,
+	operations : Soroban_Operation_Instructions,
+	operands : Soroban_Operands,
+}
+
+Soroban_Operation_Instructions :: struct {
+	current_idx_opins : i64,
+	remain_value : i64,
+	instructions : [MAX_MAX_SOROBAN_INSTRUCTIONS_PER_BOARD]Soroban_Instructions,
+	roads_idx : [MAX_SOROBAN_INSTRUCTIONS_PER_BOARD]i64,
 }
 
 Soroban_Instructions :: union {
-INS_SB_ADD_1,
-INS_SB_ADD_2,
-INS_SB_ADD_3,
-INS_SB_ADD_4,
-INS_SB_ADD_5,
 
-INS_SB_SUB_1,
-INS_SB_SUB_2,
-INS_SB_SUB_3,
-INS_SB_SUB_4,
-INS_SB_SUB_5,
+	INS_SB_ADD_1,
+	INS_SB_ADD_2,
+	INS_SB_ADD_3,
+	INS_SB_ADD_4,
+	INS_SB_ADD_5,
 
-INS_SB_CLEAR_ROAD,
+	INS_SB_SUB_1,
+	INS_SB_SUB_2,
+	INS_SB_SUB_3,
+	INS_SB_SUB_4,
+	INS_SB_SUB_5,
 
-INS_SB_NOP,
+	INS_SB_CLEAR_ROAD,
+
+	INS_SB_NOP,
 
 };
 
@@ -211,6 +175,9 @@ INS_SB_CLEAR_ROAD :: struct {
 #+end_src
 
 DISCLAIMER .: pay attention that this code can been out of date with the actual code on the source, also, that this is not intent to been working code, but a touth exercise on who to model the Data Structure to represent the code. and this example code, need to been fuder analise for better design also, operations and instructions (bytecode asm) needs to been distinct on the actual code and simulation part.
+
+for compreension, operations as multiplication and division do not exist as well as complementary numbers, because, this is all abstractions on the fundamental structure of adition and subtractions of arbitrary roads possitions, even the idea of roads for temporary state are also a completly abstration as show on [[https://www.cambridge.org/core/journals/canadian-mathematical-bulletin/article/how-to-program-an-infinite-abacus/A6EB7DD8D57056044CCB128923764BEB][how to program a infinity abacus]], so yeah... thats the 'implementation', else where, we use the resulting simulation of the architecture to do checks with the operational system operators, on the UI, if is correct the result of the simulation and state of the board..
+
 
 ** TODO
 
