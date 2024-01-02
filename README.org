@@ -88,26 +88,26 @@ MAX_NUMBER_OF_BOARDS :: 64
 MAX_ROD_PER_SOROBAN_BOARD :: 12
 MAX_SOROBAN_INSTRUCTIONS_PER_BOARD :: 8192 // 2^13
 MAX_SOROBAN_OPERATIONS_PER_BOARD :: 64
+MAX_SOROBAN_OPERANDS :: 65536 // 2^16
 
 Soroban_Board :: struct {
 	board : i64,
-	idx_current_rod : i8,
-	scale_board : i64, // value to consider for scaling state eval
-	current_state_board_eval : i32, // the board can only represent 1 trilion value
+	idx_current_local_rod : i8,
+	scale_board : i32, // value to consider for scaling state eval
+	current_local_state_board_eval : i32, // the board can only represent 1 trilion value
 	current_instruction : Soroban_Instructions,
-	idx_board : i64,
+	idx_board : i64, // this is not usefult, since will been track by the ADT of the board
 };
 
 Soroban_Operands :: struct {
 	current_operand_idx : i64,
-	operand_numbers : [MAX_SOROBAN_OPERATIONS_PER_BOARD]i64,
+	operand_numbers : [MAX_SOROBAN_OPERANDS]i64,
 }
 
 Infini_Soroban :: struct {
-	[dynamic]Soroban_Board, // TODO: change to Queue
+	boards : qu.Queue(Soroban_Board),
 	total_state_of_boards : i64,
 	idx_current_board : i64,
-	idx_globa_current_rod : i64, // deprecated?
 	operations : Soroban_Operation_Instructions,
 	operands : Soroban_Operands,
 }
