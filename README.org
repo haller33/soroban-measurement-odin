@@ -5,11 +5,11 @@ try to implement a infinity Soroban Board and simulator / Assistent
 
 ** Idea
 
-use i64 as a board representation, since boards are associatives (this idea/information has not come to my mind before, this is way the main idea take so long) and values can been easily multiply by the new number/scale of necessary boards add, thereis a ways and sheap way of implement this with dynamic arrays using Odin buildin dynamic array and the i64
+use i64 as a board representation, since boards are associatives (this idea/information has not come to my mind before, this is way the main idea take so long) and values can been easily multiply by the new number/scale of necessary boards add, thereis a ways and sheap way of implement this with dynamic arrays/queues (preferable queues because infinity small numbers representation) using Odin buildin dynamic array and the i64
 
 the i64 or int64_t on C, are a great way to have a board representation, because is a conveninent number, that can been expoerted/dumped and used on another language without so much conversion
 
-the calculations show that it can perform a 12 roads board of Soroban with can proficiently handle a 1 trilion digit board support on the 1.8E19 combinations of the i64 (2^64), with this, a association of boards can been perform
+the calculations show that it can perform a 12 roads board of Soroban (64 / 5 ~ 12) with can proficiently handle a 1 trilion value board support on the 1.8E19 combinations of the i64 (2^64), with this, a association of boards can been perform
 
 the main idea is that the board is on a configuration on with the numbers are on a sequence on the binary representation of the number, using each bit to represent a uppper bead (with can bee associated on the lower beads to bee positive upper beads too (or down beads on the 5 bead value on the top of the soroban)).
 
@@ -57,6 +57,8 @@ on with we take 5 bits each to represent a road ( with have 5 beads total )
   | 0 0 0 ] --- three last bits that can bee used of represent boards states, if necessary
 #+end_src
 
+(DISCLAIMER .: been ware that this struct probably will not reflect the actual slicing of 5 bits at time of the actual i64)
+
 there is 12 roads on with the top and botton, if one road is active on a bit, of one colum, they will active value of the road of this road, this is exception of the road of the top, with active, value +5 on the road on question.
 
 with this approuch, xor | bitwish operations will been more performantic and more eficient for more disclosure and even multiplications for zeration of ceart parts of the board. of instance, enable 4 on botton will make any road on the botton, to been zero. for instance, we can create with bitwish operations MACRO numbers to represent board default states, and check for places where there is values, more eficiently as well as setting new state of the board more rapidly
@@ -79,6 +81,7 @@ The Instructions and ADT
 
 #+begin_src odin
 
+MAX_NUMBER_OF_BOARDS :: 64
 MAX_ROAD_PER_SOROBAN_BOARD :: 12
 MAX_SOROBAN_INSTRUCTIONS_PER_BOARD :: 8192 // 2^13
 MAX_SOROBAN_OPERATIONS_PER_BOARD :: 64
@@ -114,7 +117,7 @@ SB_Cubic_Square :: struct {
 	SB_Instructions : [MAX_INSTRUCTIONS_PER_BOARD]Soroban_Instructions
 }
 
-Operation_Soroban_Type :: enum {
+Operation_Soroban_Type :: union {
 	SB_Addition,
 	SB_Multiplication,
 	SB_Subtration,
@@ -125,11 +128,11 @@ Operation_Soroban_Type :: enum {
 
 Soroban_Board :: struct {
 	board : i64,
-	current_state_board_eval : i64,
+	idx_current_road : i8,
+	MAX_ROADS : i8 = MAX_ROAD_PER_SOROBAN_BOARD,
+	scale_board : i16 = 1, // value to consider for scaling state eval
+	current_state_board_eval : i32,
 	current_instruction : Soroban_Instructions,
-	MAX_ROADS : i64 = MAX_ROAD_PER_SOROBAN_BOARD,
-	scale_board : i64 = 1, // value to consider for scaling state eval
-	idx_road : i64,
 	idx_board : i64,
 };
 
@@ -147,27 +150,26 @@ Infini_Soroban :: struct {
 	idx_current_board : i64,
 	idx_globa_current_road : i64,
 	number_of_boards : i64,
-	MAX_BOARDS : i64,
+	MAX_BOARDS : i64 = MAX_NUMBER_OF_BOARDS,
 	operations : Soroban_Operations,
 }
 
-Soroban_Instructions :: enum {
+Soroban_Instructions :: union {
 INS_SB_ADD_1,
 INS_SB_ADD_2,
 INS_SB_ADD_3,
 INS_SB_ADD_4,
 INS_SB_ADD_5,
+
 INS_SB_SUB_1,
 INS_SB_SUB_2,
 INS_SB_SUB_3,
 INS_SB_SUB_4,
 INS_SB_SUB_5,
 
-// this instructions do not make sense on the board, since they are instructions that take place on the board abstract idea.
-// INS_SB_COMPL_5,
-// INS_SB_COMPL_10,
-// INS_SB_RELATIVE_ADD,
-// INS_SB_RELATIVE_SUB,
+INS_SB_CLEAR_ROAD,
+
+INS_SB_NOP,
 
 };
 
@@ -201,6 +203,10 @@ INS_SB_SUB_4 :: struct {
 INS_SB_SUB_5 :: struct {
 	MACRO_NUMBER_INS_SB_SUB_5 : i64,
 }
+INS_SB_CLEAR_ROAD :: struct {
+	MACRO_NUMBER_INS_SB_CLEAR_ROAD : i64,
+}
+
 
 #+end_src
 
